@@ -1,0 +1,70 @@
+parameters:
+  salary_manage.batch_size: '%env(int:default:default_salary_batch_size:SALARY_BATCH_SIZE)%'
+  salary_manage.cache_enabled: '%env(bool:default:default_salary_cache_enabled:SALARY_CACHE_ENABLED)%'
+  salary_manage.max_processing_time: '%env(int:default:default_salary_max_processing_time:SALARY_MAX_PROCESSING_TIME)%'
+  default_salary_batch_size: 100
+  default_salary_cache_enabled: true
+  default_salary_max_processing_time: 30
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  # Service layer services
+  Tourze\SalaryManageBundle\Service\ApprovalWorkflowService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\DataImportExportService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\DefaultRegionalConfigProvider:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\ExternalSystemService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\PaymentProcessorService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\ReportGeneratorService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\SalaryCalculatorService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\SocialInsuranceCalculatorService:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\TaxBracketProvider:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\TaxCalculatorService:
+    autoconfigure: true
+
+  # Rules services
+  Tourze\SalaryManageBundle\Service\Rules\AllowanceRule:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\Rules\BasicSalaryRule:
+    autoconfigure: true
+
+  Tourze\SalaryManageBundle\Service\Rules\OvertimeRule:
+    autoconfigure: true
+
+  # Repository services
+  Tourze\SalaryManageBundle\Repository\:
+    resource: '../../Repository/'
+    public: true
+
+  # AdminMenu service
+  Tourze\SalaryManageBundle\Service\AdminMenu:
+    autoconfigure: true
+    public: true
+
+  # CRUD Controllers
+  Tourze\SalaryManageBundle\Controller\Admin\:
+    resource: '../../Controller/Admin/'
+    public: true
+    autoconfigure: true

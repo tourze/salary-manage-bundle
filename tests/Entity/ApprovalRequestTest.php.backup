@@ -1,0 +1,489 @@
+<?php
+
+namespace Tourze\SalaryManageBundle\Tests\Entity;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Tourze\SalaryManageBundle\Entity\ApprovalRequest;
+use Tourze\SalaryManageBundle\Entity\Employee;
+use Tourze\SalaryManageBundle\Entity\PayrollPeriod;
+use Tourze\SalaryManageBundle\Entity\SalaryCalculation;
+use Tourze\SalaryManageBundle\Enum\ApprovalStatus;
+use Tourze\SalaryManageBundle\Exception\DataValidationException;
+
+/**
+ * 审批请求实体测试
+ * 验收标准：测试审批请求的完整业务逻辑和状态转换
+ * @internal
+ */
+#[CoversClass(ApprovalRequest::class)]
+final class ApprovalRequestTest extends TestCase
+{
+    private Employee $submitter;
+
+    private Employee $approver;
+
+    private PayrollPeriod $period;
+
+    /** @var array<int, SalaryCalculation> */
+    private array $salaryCalculations = [];
+
+    private \DateTimeImmutable $submittedAt;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->submittedAt = new \DateTimeImmutable();
+
+        // 初始化测试对象
+        $this->submitter = new Employee();
+        $this->submitter; $employee->setEmployeeNumber('EMP001');;
+        $this->submitter;
+        $this->submitter; $employee->setDepartment('财务部');;
+        $this->submitter; $employee->setBaseSalary('8000.00');;
+        $this->submitter; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        $this->approver = new Employee();
+        $this->approver; $employee->setEmployeeNumber('HR001');;
+        $this->approver;
+        $this->approver; $employee->setDepartment('人事部');;
+        $this->approver; $employee->setBaseSalary('12000.00');;
+        $this->approver; $employee->setHireDate(new \DateTimeImmutable('2023-01-01'););
+
+        $this->period = new PayrollPeriod(2025, 1);
+    }
+
+    /**
+     * 创建被测实体的一个实例.
+     */
+    protected function createEntity(): ApprovalRequest
+    {
+        // 创建测试提交者
+        $this->submitter = new Employee();
+        $this->submitter; $employee->setEmployeeNumber('EMP001');;
+        $this->submitter;
+        $this->submitter; $employee->setDepartment('财务部');;
+        $this->submitter; $employee->setBaseSalary('8000.00');;
+        $this->submitter; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        // 创建测试审批者
+        $this->approver = new Employee();
+        $this->approver; $employee->setEmployeeNumber('HR001');;
+        $this->approver;
+        $this->approver; $employee->setDepartment('人事部');;
+        $this->approver; $employee->setBaseSalary('12000.00');;
+        $this->approver; $employee->setHireDate(new \DateTimeImmutable('2023-01-01'););
+
+        $this->period = new PayrollPeriod(2025, 1);
+
+        // 创建测试薪资计算数据
+        $employee1 = new Employee();
+        $employee1; $employee->setEmployeeNumber('EMP002');;
+        $employee1;
+        $employee1; $employee->setBaseSalary('6000.00');;
+        $employee1; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        $calculation1 = new SalaryCalculation($employee1, $this->period);
+        $this->salaryCalculations = [$calculation1];
+
+        $this->submittedAt = new \DateTimeImmutable();
+
+        return new ApprovalRequest(
+            requestId: 'TEST_APPROVAL',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt,
+            metadata: []
+        );
+    }
+
+    public function testConstructWithValidDataShouldCreateInstance(): void
+    {
+        // 创建测试提交者
+        $submitter = new Employee();
+        $submitter; $employee->setEmployeeNumber('EMP001');;
+        $submitter;
+        $submitter; $employee->setDepartment('财务部');;
+        $submitter; $employee->setBaseSalary('8000.00');;
+        $submitter; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        $period = new PayrollPeriod(2025, 1);
+
+        // 创建测试薪资计算数据
+        $employee1 = new Employee();
+        $employee1; $employee->setEmployeeNumber('EMP002');;
+        $employee1;
+        $employee1; $employee->setBaseSalary('6000.00');;
+        $employee1; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        $calculation1 = new SalaryCalculation($employee1, $period);
+        $salaryCalculations = [$calculation1];
+
+        $submittedAt = new \DateTimeImmutable();
+
+        $requestId = 'APPROVAL_202501_EMP001_123';
+        $metadata = ['total_employees' => 1, 'submission_source' => 'system'];
+
+        $request = new ApprovalRequest(
+            requestId: $requestId,
+            salaryCalculations: $salaryCalculations,
+            period: $period,
+            submitter: $submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $submittedAt,
+            metadata: $metadata
+        );
+
+        $this->assertEquals($requestId, $request->getRequestId());
+        $this->assertEquals($salaryCalculations, $request->getSalaryCalculations());
+        $this->assertSame($period, $request->getPeriod());
+        $this->assertSame($submitter, $request->getSubmitter());
+        $this->assertEquals(ApprovalStatus::Pending, $request->getStatus());
+        $this->assertEquals($submittedAt, $request->getSubmittedAt());
+        $this->assertEquals($metadata, $request->getMetadata());
+    }
+
+    public function testConstructWithEmptySalaryCalculationsShouldThrowException(): void
+    {
+        $this->expectException(DataValidationException::class);
+        $this->expectExceptionMessage('审批请求必须包含至少一个薪资计算记录');
+
+        // 创建测试提交者
+        $submitter = new Employee();
+        $submitter; $employee->setEmployeeNumber('EMP001');;
+        $submitter;
+        $submitter; $employee->setDepartment('财务部');;
+        $submitter; $employee->setBaseSalary('8000.00');;
+        $submitter; $employee->setHireDate(new \DateTimeImmutable('2024-01-01'););
+
+        $period = new PayrollPeriod(2025, 1);
+        $submittedAt = new \DateTimeImmutable();
+
+        new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: [],
+            period: $period,
+            submitter: $submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $submittedAt
+        );
+    }
+
+    public function testGetTotalAmountShouldReturnSumOfNetAmounts(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $totalAmount = $request->getTotalAmount();
+
+        // 由于SalaryCalculation没有设置具体的Items，getNetAmount()默认返回0
+        $this->assertEquals(0.0, $totalAmount);
+    }
+
+    public function testGetEmployeeCountShouldReturnCorrectCount(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $this->assertEquals(1, $request->getEmployeeCount());
+    }
+
+    public function testIsPendingWithPendingStatusShouldReturnTrue(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $this->assertTrue($request->isPending());
+        $this->assertFalse($request->isApproved());
+        $this->assertFalse($request->isRejected());
+    }
+
+    public function testIsApprovedWithApprovedStatusShouldReturnTrue(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Approved,
+            submittedAt: $this->submittedAt,
+            approver: $this->approver,
+            approvedAt: new \DateTimeImmutable(),
+            comments: '审批通过'
+        );
+
+        $this->assertTrue($request->isApproved());
+        $this->assertFalse($request->isPending());
+        $this->assertFalse($request->isRejected());
+    }
+
+    public function testIsRejectedWithRejectedStatusShouldReturnTrue(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Rejected,
+            submittedAt: $this->submittedAt,
+            approver: $this->approver,
+            approvedAt: new \DateTimeImmutable(),
+            rejectionReason: '数据有误'
+        );
+
+        $this->assertTrue($request->isRejected());
+        $this->assertFalse($request->isPending());
+        $this->assertFalse($request->isApproved());
+    }
+
+    public function testWithApprovalShouldCreateNewApprovedInstance(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $originalRequest = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $comments = '审批通过，数据核实无误';
+        $approvedRequest = $originalRequest->withApproval($this->approver, $comments);
+
+        // 验证新实例的状态
+        $this->assertEquals(ApprovalStatus::Approved, $approvedRequest->getStatus());
+        $this->assertSame($this->approver, $approvedRequest->getApprover());
+        $this->assertEquals($comments, $approvedRequest->getComments());
+        $this->assertNotNull($approvedRequest->getApprovedAt());
+
+        // 验证原实例未变更
+        $this->assertEquals(ApprovalStatus::Pending, $originalRequest->getStatus());
+        $this->assertNull($originalRequest->getApprover());
+
+        // 验证审批历史
+        $history = $approvedRequest->getApprovalHistory();
+        $this->assertCount(1, $history);
+        $latestEntry = end($history);
+        $this->assertIsArray($latestEntry);
+        $this->assertEquals('approved', $latestEntry['action']);
+        $this->assertEquals($this->approver->getId(), $latestEntry['approver_id']);
+        $this->assertEquals($this->approver->getName(), $latestEntry['approver_name']);
+        $this->assertEquals($comments, $latestEntry['comments']);
+    }
+
+    public function testWithRejectionShouldCreateNewRejectedInstance(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $originalRequest = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $reason = '薪资数据存在错误，需要重新核算';
+        $rejectedRequest = $originalRequest->withRejection($this->approver, $reason);
+
+        // 验证新实例的状态
+        $this->assertEquals(ApprovalStatus::Rejected, $rejectedRequest->getStatus());
+        $this->assertSame($this->approver, $rejectedRequest->getApprover());
+        $this->assertEquals($reason, $rejectedRequest->getRejectionReason());
+        $this->assertNotNull($rejectedRequest->getApprovedAt());
+
+        // 验证原实例未变更
+        $this->assertEquals(ApprovalStatus::Pending, $originalRequest->getStatus());
+        $this->assertNull($originalRequest->getApprover());
+
+        // 验证审批历史
+        $history = $rejectedRequest->getApprovalHistory();
+        $this->assertCount(1, $history);
+        $latestEntry = end($history);
+        $this->assertIsArray($latestEntry);
+        $this->assertEquals('rejected', $latestEntry['action']);
+        $this->assertEquals($this->approver->getId(), $latestEntry['approver_id']);
+        $this->assertEquals($this->approver->getName(), $latestEntry['approver_name']);
+        $this->assertEquals($reason, $latestEntry['reason']);
+    }
+
+    public function testGetDisplayInfoShouldReturnFormattedData(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $requestId = 'APPROVAL_202501_EMP001_123';
+        $comments = '审批通过';
+        $approvedAt = new \DateTimeImmutable('2025-01-15 14:30:00');
+
+        $request = new ApprovalRequest(
+            requestId: $requestId,
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Approved,
+            submittedAt: $this->submittedAt,
+            approver: $this->approver,
+            approvedAt: $approvedAt,
+            comments: $comments
+        );
+
+        $displayInfo = $request->getDisplayInfo();
+
+        $this->assertEquals($requestId, $displayInfo['request_id']);
+        $this->assertEquals($this->period->getKey(), $displayInfo['period']);
+        $this->assertEquals($this->submitter->getName(), $displayInfo['submitter']);
+        $this->assertEquals(1, $displayInfo['employee_count']);
+        $this->assertEquals('0.00', $displayInfo['total_amount']);
+        $this->assertEquals(ApprovalStatus::Approved->getLabel(), $displayInfo['status']);
+        $this->assertEquals($this->approver->getName(), $displayInfo['approver']);
+        $this->assertEquals('2025-01-15 14:30:00', $displayInfo['approved_at']);
+        $this->assertEquals($comments, $displayInfo['comments']);
+    }
+
+    public function testGetDisplayInfoWithPendingRequestShouldHaveNullApprovalFields(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $displayInfo = $request->getDisplayInfo();
+
+        $this->assertNull($displayInfo['approver']);
+        $this->assertNull($displayInfo['approved_at']);
+        $this->assertEquals('', $displayInfo['comments']);
+        $this->assertEquals('', $displayInfo['rejection_reason']);
+    }
+
+    public function testApprovalHistoryPreservationThroughStatusChanges(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt,
+            approvalHistory: ['history' => ['initial' => 'data']]
+        );
+
+        $approvedRequest = $request->withApproval($this->approver, 'First approval');
+
+        $history = $approvedRequest->getApprovalHistory();
+        $this->assertCount(2, $history); // 原有键值对 + 新增审批记录
+        $this->assertEquals(['initial' => 'data'], $history['history']);
+
+        // 查找最新的审批记录
+        $approvalEntries = array_filter($history, fn($key) => str_starts_with($key, 'approval_'), ARRAY_FILTER_USE_KEY);
+        $latestApproval = end($approvalEntries);
+        $this->assertIsArray($latestApproval);
+        $this->assertEquals('approved', $latestApproval['action']);
+    }
+
+    public function testImmutabilityOfReadonlyClass(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt
+        );
+
+        $originalStatus = $request->getStatus();
+        $originalApprover = $request->getApprover();
+
+        // 通过withApproval创建新实例
+        $approvedRequest = $request->withApproval($this->approver, 'Test');
+
+        // 原实例应保持不变
+        $this->assertEquals($originalStatus, $request->getStatus());
+        $this->assertEquals($originalApprover, $request->getApprover());
+
+        // 新实例应有新状态
+        $this->assertEquals(ApprovalStatus::Approved, $approvedRequest->getStatus());
+        $this->assertSame($this->approver, $approvedRequest->getApprover());
+    }
+
+    public function testMetadataHandlingThroughStatusChanges(): void
+    {
+        // 先创建测试实体以初始化属性
+        $this->createEntity();
+
+        $originalMetadata = [
+            'submission_source' => 'system',
+            'priority' => 'high',
+            'notes' => 'urgent processing required',
+        ];
+
+        $request = new ApprovalRequest(
+            requestId: 'APPROVAL_TEST',
+            salaryCalculations: $this->salaryCalculations,
+            period: $this->period,
+            submitter: $this->submitter,
+            status: ApprovalStatus::Pending,
+            submittedAt: $this->submittedAt,
+            metadata: $originalMetadata
+        );
+
+        $approvedRequest = $request->withApproval($this->approver, 'Approved');
+
+        // 元数据应该保持不变
+        $this->assertEquals($originalMetadata, $approvedRequest->getMetadata());
+    }
+}

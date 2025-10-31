@@ -1,0 +1,11 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    SalaryManageBundle:
+                        is_bundle: true
+                        type: attribute
+                        dir: Entity
+                        prefix: Tourze\SalaryManageBundle\Entity
+                        alias: SalaryManageBundle

@@ -1,1 +1,0 @@
-# salary-manage-bundle

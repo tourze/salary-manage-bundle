@@ -1,0 +1,35 @@
+services:
+  # Mock external system for testing
+  Tourze\SalaryManageBundle\Interface\ExternalSystemInterface:
+    class: Symfony\Component\Cache\Adapter\ArrayAdapter
+    factory: ['@Symfony\Component\Cache\Adapter\ArrayAdapter', 'create']
+    calls:
+      - [ 'setMock', [ '@Tourze\SalaryManageBundle\Tests\Mock\ExternalSystemMock' ] ]
+
+  # Test mock service
+  Tourze\SalaryManageBundle\Tests\Mock\ExternalSystemMock:
+    class: Tourze\SalaryManageBundle\Tests\Mock\ExternalSystemMock
+    shared: false
+
+  # Adapter services with mock dependencies
+  Tourze\SalaryManageBundle\Adapter\AttendanceDataAdapter:
+    arguments: ['@Tourze\SalaryManageBundle\Interface\ExternalSystemInterface']
+    
+  Tourze\SalaryManageBundle\Adapter\PerformanceDataAdapter:
+    arguments: ['@Tourze\SalaryManageBundle\Interface\ExternalSystemInterface']
+
+  # Service configurations for testing
+  Tourze\SalaryManageBundle\Service\ApprovalWorkflowService:
+    arguments: ['%env(default::string:APP_ENV)%', '@logger', '@doctrine.orm.entity_manager']
+    
+  Tourze\SalaryManageBundle\Service\DataImportExportService:
+    arguments: ['@doctrine.orm.entity_manager', '@logger', '%env(default::string:APP_ENV)%']
+    
+  Tourze\SalaryManageBundle\Service\ReportGeneratorService:
+    arguments: ['@Tourze\SalaryManageBundle\Repository\EmployeeRepository', '@Tourze\SalaryManageBundle\Service\TaxCalculatorInterface', { export_path: '%kernel.cache_dir%/test_reports' }]
+    
+  Tourze\SalaryManageBundle\Service\SocialInsuranceCalculatorService:
+    arguments: ['@Tourze\SalaryManageBundle\Interface\RegionalConfigProviderInterface', '@Tourze\LockServiceBundle\Service\LockService']
+    
+  Tourze\SalaryManageBundle\Service\TaxCalculatorService:
+    arguments: ['@Tourze\SalaryManageBundle\Service\TaxBracketProvider', '@Tourze\LockServiceBundle\Service\LockService']
