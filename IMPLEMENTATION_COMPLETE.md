@@ -125,7 +125,7 @@
   "doctrine/orm": "^3.0",
   "symfony/framework-bundle": "^7.3",
   "symfony/validator": "^7.3",
-  "tourze/enum-extra": "1.*"
+  "tourze/enum-extra": "1.0.*"
 }
 ```
 
