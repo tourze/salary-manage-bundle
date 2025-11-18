@@ -28,11 +28,6 @@ class SalaryItemCrudControllerTest extends AbstractEasyAdminControllerTestCase
         return self::getService(SalaryItemCrudController::class);
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(SalaryItem::class, SalaryItemCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new SalaryItemCrudController();

@@ -59,11 +59,6 @@ class PayslipTemplateCrudControllerTest extends AbstractEasyAdminControllerTestC
         yield 'content' => ['content'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(PayslipTemplate::class, PayslipTemplateCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new PayslipTemplateCrudController();

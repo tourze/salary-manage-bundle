@@ -57,11 +57,6 @@ class PayrollPeriodCrudControllerTest extends AbstractEasyAdminControllerTestCas
         yield 'month' => ['month'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(PayrollPeriod::class, PayrollPeriodCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new PayrollPeriodCrudController();

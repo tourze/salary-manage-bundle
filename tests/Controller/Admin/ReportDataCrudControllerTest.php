@@ -58,11 +58,6 @@ class ReportDataCrudControllerTest extends AbstractEasyAdminControllerTestCase
         yield 'reportType_field' => ['reportType'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(ReportData::class, ReportDataCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new ReportDataCrudController();

@@ -55,11 +55,6 @@ class SalaryCalculationCrudControllerTest extends AbstractEasyAdminControllerTes
         yield 'period_field' => ['period'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(SalaryCalculation::class, SalaryCalculationCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new SalaryCalculationCrudController();

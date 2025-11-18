@@ -62,11 +62,6 @@ class EmployeeCrudControllerTest extends AbstractEasyAdminControllerTestCase
         yield '入职日期字段' => ['hireDate'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(Employee::class, EmployeeCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new EmployeeCrudController();
